@@ -1,7 +1,34 @@
 #![feature(box_patterns, box_syntax)]
 
+use std::io;
+use std::collections::HashMap;
+
 pub mod huffman;
 use huffman::{Node, get_two_lowest};
+
+
+fn read_input() -> String {
+    let mut buffer = String::new();
+
+    match io::stdin().read_line(&mut buffer) {
+        Ok(n) => {
+            println!("Your text: {}", buffer);
+        }
+        Err(error) => {
+            println!("Error! {}", error);
+        }
+    }
+    return buffer.trim().to_string();
+}
+
+
+fn encode_char(letter: &str, dictionary: &HashMap<String, Vec<i32>>) -> String {
+
+    let codes = dictionary.get(letter).unwrap();
+    let converted: Vec<String> = codes.iter().map(|a| a.to_string()).collect();
+
+    return converted.join("");;
+}
 
 
 fn main() {
@@ -28,6 +55,10 @@ fn main() {
     let root: Node = nodes.pop().unwrap();
     let result = root.generate_codes();
     let dictionary = root.build_dictionary(result);
-    println!("{:?}", dictionary);
+
+    let to_encode_text = read_input();
+    let text_vec = to_encode_text.split("").filter_map(|c| if ["A", "B", "C", "D"].contains(&c) { Some(c) } else { None }).collect::<Vec<&str>>();
+    let result: Vec<String> = text_vec.iter().map(|elem| encode_char(elem, &dictionary)).collect();
+    println!("result: {:?}", result);
 
 }
