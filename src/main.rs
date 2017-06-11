@@ -4,14 +4,21 @@ use std::io;
 use std::collections::HashMap;
 
 pub mod huffman;
-use huffman::{Node, get_two_lowest};
+use huffman::Node;
+
+/// Huffman algorithm as defined here: https://www.siggraph.org/education/materials/HyperGraph/video/mpeg/mpegfaq/huffman_tutorial.html
 
 
 fn read_input() -> String {
+
+    /// Read user input and remove white chars.
+
+    println!("Type your text to encode.");
+
     let mut buffer = String::new();
 
     match io::stdin().read_line(&mut buffer) {
-        Ok(n) => {
+        Ok(_) => {
             println!("Your text: {}", buffer);
         }
         Err(error) => {
@@ -24,6 +31,8 @@ fn read_input() -> String {
 
 fn encode_char(letter: &str, dictionary: &HashMap<String, Vec<i32>>) -> String {
 
+    /// Replace a letter with the corresponding list of numbers.
+
     let codes = dictionary.get(letter).unwrap();
     let converted: Vec<String> = codes.iter().map(|a| a.to_string()).collect();
 
@@ -32,6 +41,10 @@ fn encode_char(letter: &str, dictionary: &HashMap<String, Vec<i32>>) -> String {
 
 
 fn main() {
+
+    /// Some arbitrary letters and the probability of their occurence in text.
+
+    let available_letters = ["A", "B", "C", "D"];
 
     let mut nodes = vec![
         Node {symbol: "A", prob: 0.4, left: None, right: None},
@@ -42,14 +55,8 @@ fn main() {
 
     while nodes.len() > 1 {
 
-        get_two_lowest(&mut nodes);
+        Node::create_branch(&mut nodes);
 
-    }
-
-    println!("Number of nodes: {}", nodes.len());
-
-    for node in &nodes {
-        println!("Iterating nodes: symbol: {}, prob: {}", node.symbol, node.prob);
     }
 
     let root: Node = nodes.pop().unwrap();
@@ -57,8 +64,12 @@ fn main() {
     let dictionary = root.build_dictionary(result);
 
     let to_encode_text = read_input();
-    let text_vec = to_encode_text.split("").filter_map(|c| if ["A", "B", "C", "D"].contains(&c) { Some(c) } else { None }).collect::<Vec<&str>>();
-    let result: Vec<String> = text_vec.iter().map(|elem| encode_char(elem, &dictionary)).collect();
-    println!("result: {:?}", result);
+    let text_vec = to_encode_text.split("")
+                                 .filter_map(|c| if available_letters.contains(&c) { Some(c) } else { None })
+                                 .collect::<Vec<&str>>();
+    let result: Vec<String> = text_vec.iter()
+                                      .map(|elem| encode_char(elem, &dictionary))
+                                      .collect();
+    println!("Result: {:?}", result);
 
 }
