@@ -60,8 +60,8 @@ fn main() {
     }
 
     let root: Node = nodes.pop().unwrap();
-    let result = root.generate_codes();
-    let dictionary = root.build_dictionary(result);
+    let result_list = root.generate_codes();
+    let dictionary = root.build_dictionary(result_list);
 
     let to_encode_text = read_input();
     let text_vec = to_encode_text.split("")
